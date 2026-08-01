@@ -1,16 +1,27 @@
 'use strict';
 
+// Estado y logica pura del juego: niveles, mazo de banderas, mezcla,
+// comparacion de cartas y calculo del puntaje. No toca el DOM directamente,
+// eso es responsabilidad de ui.js.
 var Game = {};
 
+// Configuracion de cada nivel de dificultad: cantidad de columnas del
+// tablero, cantidad de pares y penalizacion por error (segun el PDF de la
+// consigna: facil -10, medio -20, dificil -30).
 Game.LEVELS = {
   facil: { key: 'facil', label: 'Facil', columns: 4, pairs: 8, errorPenalty: 10 },
   medio: { key: 'medio', label: 'Medio', columns: 5, pairs: 10, errorPenalty: 20 },
   dificil: { key: 'dificil', label: 'Dificil', columns: 6, pairs: 18, errorPenalty: 30 }
 };
 
+// Envoltorio comun para armar cada bandera como un SVG propio (en vez de un
+// emoji de bandera, que depende de la fuente del sistema operativo).
 Game.FLAG_SVG_OPEN = '<svg viewBox="0 0 3 2" preserveAspectRatio="xMidYMid slice" aria-hidden="true">';
 Game.FLAG_SVG_CLOSE = '</svg>';
 
+// Banderas disponibles para armar los pares. Hay 18 en total: la cantidad
+// exacta que necesita el nivel dificil (18 pares). Cada una tiene su propio
+// dibujo SVG simplificado, hecho a mano con rectangulos, circulos y poligonos.
 Game.FLAGS = [
   { code: 'ar', name: 'Argentina', svg: Game.FLAG_SVG_OPEN + '<rect width="3" height="2" fill="#fff"/><rect width="3" height="0.6667" fill="#75aadb"/><rect y="1.3333" width="3" height="0.6667" fill="#75aadb"/><circle cx="1.5" cy="1" r="0.22" fill="#f6b40e"/>' + Game.FLAG_SVG_CLOSE },
   { code: 'br', name: 'Brasil', svg: Game.FLAG_SVG_OPEN + '<rect width="3" height="2" fill="#009c3b"/><polygon points="1.5,0.25 2.75,1 1.5,1.75 0.25,1" fill="#ffdf00"/><circle cx="1.5" cy="1" r="0.42" fill="#002776"/>' + Game.FLAG_SVG_CLOSE },
@@ -32,13 +43,20 @@ Game.FLAGS = [
   { code: 'hr', name: 'Croacia', svg: Game.FLAG_SVG_OPEN + '<rect width="3" height="0.6667" fill="#ff0000"/><rect y="0.6667" width="3" height="0.6667" fill="#fff"/><rect y="1.3333" width="3" height="0.6667" fill="#171796"/>' + Game.FLAG_SVG_CLOSE }
 ];
 
+// Constantes de la formula de puntaje (documentada tambien en el README):
+// puntaje = pares*100 - errores*penalizacion_del_nivel - segundos + 300 al terminar.
 Game.SCORE_PER_MATCH = 100;
 Game.SCORE_FINISH_BONUS = 300;
 Game.SCORE_PENALTY_PER_SECOND = 1;
+// Tiempo que quedan visibles dos cartas que no forman un par antes de ocultarse.
 Game.CARD_HIDE_DELAY_MS = 900;
 
+// Estado de la partida en curso. Se recrea por completo en Game.start,
+// tanto al iniciar como al reiniciar una partida.
 Game.state = null;
 
+// Mezcla aleatoria tipo Fisher-Yates. Devuelve un arreglo nuevo, no modifica
+// el original (se usa tanto para elegir banderas como para mezclar el mazo).
 Game.shuffleArray = function (originalArray) {
   var shuffledArray, currentIndex, randomIndex, temporaryValue;
   shuffledArray = originalArray.slice();
@@ -53,6 +71,9 @@ Game.shuffleArray = function (originalArray) {
   return shuffledArray;
 };
 
+// Arma el mazo de cartas para un nivel: elige al azar tantas banderas como
+// pares necesite el nivel, crea dos cartas por bandera (mismo pairCode) y
+// mezcla el mazo completo.
 Game.buildDeck = function (levelConfig) {
   var chosenFlags, deck, index, flag;
   chosenFlags = Game.shuffleArray(Game.FLAGS).slice(0, levelConfig.pairs);
@@ -65,6 +86,9 @@ Game.buildDeck = function (levelConfig) {
   return Game.shuffleArray(deck);
 };
 
+// Inicializa una partida nueva (se llama tanto al empezar a jugar como al
+// reiniciar): crea el estado desde cero con el mazo mezclado y los
+// contadores en cero.
 Game.start = function (playerName, levelKey) {
   var levelConfig = Game.LEVELS[levelKey];
   Game.state = {
@@ -85,6 +109,7 @@ Game.start = function (playerName, levelKey) {
   return Game.state;
 };
 
+// Busca una carta del mazo actual por su id.
 Game.findCardById = function (cardId) {
   var index;
   for (index = 0; index < Game.state.deck.length; index += 1) {
@@ -95,6 +120,9 @@ Game.findCardById = function (cardId) {
   return null;
 };
 
+// Determina si una carta puede seleccionarse: no debe existir ya un par
+// esperando resolverse, la carta no debe estar ya emparejada ni revelada,
+// y no puede haber mas de dos cartas elegidas en el turno actual.
 Game.isCardSelectable = function (card) {
   if (!card) {
     return false;
@@ -111,6 +139,9 @@ Game.isCardSelectable = function (card) {
   return true;
 };
 
+// Revela una carta al hacer click. Arranca la bandera del temporizador en la
+// primera carta de toda la partida, y bloquea el tablero apenas se junta el
+// segundo intento del turno (para que main.js pueda resolver la comparacion).
 Game.revealCard = function (cardId) {
   var card = Game.findCardById(cardId);
   if (!Game.isCardSelectable(card)) {
@@ -128,6 +159,9 @@ Game.revealCard = function (cardId) {
   return card;
 };
 
+// Compara las dos cartas seleccionadas en el turno. Si coinciden las marca
+// como emparejadas y suma un par; si no, suma un error. Siempre recalcula
+// el puntaje al final.
 Game.resolveSelection = function () {
   var firstCard, secondCard, isMatch;
   firstCard = Game.findCardById(Game.state.selectedCardIds[0]);
@@ -144,6 +178,8 @@ Game.resolveSelection = function () {
   return { isMatch: isMatch, firstCard: firstCard, secondCard: secondCard };
 };
 
+// Vuelve a ocultar las dos cartas del turno cuando NO formaron un par
+// (las que si emparejaron quedan reveladas) y desbloquea el tablero.
 Game.hideUnmatchedSelection = function () {
   var firstCard, secondCard;
   firstCard = Game.findCardById(Game.state.selectedCardIds[0]);
@@ -158,15 +194,20 @@ Game.hideUnmatchedSelection = function () {
   Game.state.isBoardLocked = false;
 };
 
+// Limpia la seleccion del turno cuando SI formaron un par correcto
+// (las cartas quedan reveladas, solo se libera el turno).
 Game.clearMatchedSelection = function () {
   Game.state.selectedCardIds = [];
   Game.state.isBoardLocked = false;
 };
 
+// La partida termina cuando se encontraron todos los pares del nivel.
 Game.isGameComplete = function () {
   return Game.state.matchedPairs === Game.state.level.pairs;
 };
 
+// Recalcula el puntaje actual con la formula del proyecto (ver README).
+// El puntaje nunca puede quedar en negativo.
 Game.updateScore = function () {
   var baseScore, errorsPenalty, timePenalty, finishBonus, totalScore;
   baseScore = Game.state.matchedPairs * Game.SCORE_PER_MATCH;
@@ -181,6 +222,8 @@ Game.updateScore = function () {
   return Game.state.score;
 };
 
+// Marca la partida como terminada y recalcula el puntaje para que incluya
+// el bonus fijo por finalizar.
 Game.finish = function () {
   Game.state.isFinished = true;
   Game.updateScore();

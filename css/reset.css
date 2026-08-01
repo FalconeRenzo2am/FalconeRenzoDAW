@@ -1,3 +1,6 @@
+/* Reset basico para normalizar estilos por defecto entre navegadores,
+   antes de aplicar los estilos propios del proyecto en styles.css. */
+
 *,
 *::before,
 *::after {

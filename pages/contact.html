@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
+  <!-- Mismo encabezado y navegacion que index.html, adaptado con rutas
+       relativas porque esta pagina esta dentro de /pages -->
   <header class="site-header">
     <h1 class="site-header__title">Memotest Banderas del Mundo</h1>
     <nav class="site-nav">
@@ -29,6 +31,8 @@
   </header>
 
   <main class="main-content">
+    <!-- Formulario de contacto validado por contact.js. Al enviarse
+         correctamente abre el cliente de mail predeterminado via mailto:. -->
     <section class="contact-screen">
       <h2 class="contact-screen__title">Contacto</h2>
       <p class="contact-screen__description">¿Encontraste un error o querés dejarnos un comentario sobre el juego? Escribinos.</p>
@@ -63,6 +67,8 @@
     </p>
   </footer>
 
+  <!-- Reutiliza validations.js y storage.js del juego; no necesita
+       game.js/ui.js/main.js porque esta pagina no tiene tablero. -->
   <script src="../js/validations.js"></script>
   <script src="../js/storage.js"></script>
   <script src="../js/contact.js"></script>

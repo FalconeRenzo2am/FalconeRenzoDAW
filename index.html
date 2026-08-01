@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+  <!-- Encabezado con el titulo, la navegacion principal y los botones de tema/sonido -->
   <header class="site-header">
     <h1 class="site-header__title">Memotest Banderas del Mundo</h1>
     <nav class="site-nav">
@@ -30,6 +31,8 @@
   </header>
 
   <main class="main-content">
+    <!-- Pantalla de inicio: se muestra primero. El nombre y el nivel se
+         validan con JavaScript antes de poder pasar a jugar. -->
     <section class="setup-screen" id="setupScreen">
       <h2 class="setup-screen__title">Encontrá todos los pares de banderas</h2>
       <p class="setup-screen__description">Ingresá tu nombre, elegí un nivel de dificultad y poné a prueba tu memoria.</p>
@@ -61,6 +64,9 @@
       <button class="secondary-button" id="openRankingButton" type="button">Ver ranking de partidas</button>
     </section>
 
+    <!-- Pantalla de juego: arranca oculta (clase "hidden") y JavaScript la
+         muestra recien despues de validar el formulario de inicio. El
+         tablero (#board) se completa dinamicamente desde ui.js. -->
     <section class="game-screen hidden" id="gameScreen">
       <div class="game-stats" id="gameStats">
         <p class="game-stats__item">Jugador<span class="game-stats__value" id="statPlayerName"></span></p>
@@ -79,6 +85,8 @@
     </section>
   </main>
 
+  <!-- Modal de victoria: reemplaza al alert() del navegador. Se completa y
+       se muestra desde UI.showWinModal cuando se encuentran todos los pares. -->
   <div class="modal-overlay hidden" id="winModal" role="dialog" aria-modal="true" aria-labelledby="winModalTitle">
     <div class="modal">
       <h2 class="modal__title" id="winModalTitle">¡Felicitaciones!</h2>
@@ -90,6 +98,8 @@
     </div>
   </div>
 
+  <!-- Modal de ranking (requerimiento deseado): lee y ordena las partidas
+       guardadas en LocalStorage por storage.js. -->
   <div class="modal-overlay hidden" id="rankingModal" role="dialog" aria-modal="true" aria-labelledby="rankingModalTitle">
     <div class="modal modal--wide">
       <h2 class="modal__title" id="rankingModalTitle">Ranking de partidas</h2>
@@ -126,6 +136,8 @@
     </div>
   </div>
 
+  <!-- Modal de confirmacion generico: reemplaza a window.confirm(), por
+       ejemplo para confirmar el borrado del historial de ranking. -->
   <div class="modal-overlay hidden" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
     <div class="modal">
       <h2 class="modal__title" id="confirmModalTitle">Confirmar acción</h2>
@@ -137,6 +149,7 @@
     </div>
   </div>
 
+  <!-- Pie de pagina con los links al repositorio (nueva pestaña) y a GitHub Pages -->
   <footer class="site-footer">
     <p class="site-footer__text">Proyecto Final - Desarrollo y Arquitecturas Web - Ingeniería en Sistemas Informáticos 2026</p>
     <p class="site-footer__text">
@@ -146,6 +159,9 @@
     </p>
   </footer>
 
+  <!-- Scripts al final del body para no bloquear el renderizado. Orden de
+       carga: primero los modulos sin dependencias (validations, storage,
+       sounds), despues game y ui, y main al final porque los usa a todos. -->
   <script src="js/validations.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/sounds.js"></script>

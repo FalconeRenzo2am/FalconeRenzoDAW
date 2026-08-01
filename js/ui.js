@@ -1,7 +1,12 @@
 'use strict';
 
+// Toda la manipulacion del DOM vive aca: crear el tablero, mostrar/ocultar
+// pantallas y modales, y actualizar los textos en pantalla. No conoce las
+// reglas del juego, solo recibe datos ya calculados por game.js.
 var UI = {};
 
+// Referencias a los elementos del DOM, cacheadas una sola vez al iniciar
+// para no llamar a getElementById en cada actualizacion.
 UI.elements = {};
 
 UI.cacheElements = function () {
@@ -31,6 +36,8 @@ UI.cacheElements = function () {
   UI.elements.soundToggleButton = document.getElementById('soundToggleButton');
 };
 
+// Helpers genericos para mostrar/ocultar cualquier elemento agregando o
+// quitando la clase "hidden" (display: none definido en styles.css).
 UI.showElement = function (element) {
   element.classList.remove('hidden');
 };
@@ -39,6 +46,7 @@ UI.hideElement = function (element) {
   element.classList.add('hidden');
 };
 
+// Cambia entre la pantalla de inicio (nombre + nivel) y la pantalla de juego.
 UI.showSetupScreen = function () {
   UI.showElement(UI.elements.setupScreen);
   UI.hideElement(UI.elements.gameScreen);
@@ -49,6 +57,7 @@ UI.showGameScreen = function () {
   UI.showElement(UI.elements.gameScreen);
 };
 
+// Muestra u oculta el texto de error debajo de un campo de formulario.
 UI.showFieldError = function (errorElement, message) {
   errorElement.textContent = message;
 };
@@ -57,10 +66,15 @@ UI.clearFieldError = function (errorElement) {
   errorElement.textContent = '';
 };
 
+// Aplica la clase que define, via CSS (Flexbox), cuantas columnas tiene el
+// tablero segun el nivel elegido (board--cols-4/5/6).
 UI.setBoardColumnsClass = function (columns) {
   UI.elements.board.className = 'board board--cols-' + columns;
 };
 
+// Crea el elemento HTML de una carta: un boton con dos caras (frente con el
+// signo de pregunta, dorso con el SVG de la bandera) que se da vuelta con
+// una animacion CSS al agregar la clase card--revealed.
 UI.buildCardElement = function (card) {
   var cardButton, cardInner, cardFront, cardBack;
   cardButton = document.createElement('button');
@@ -82,6 +96,9 @@ UI.buildCardElement = function (card) {
   return cardButton;
 };
 
+// Genera el tablero completo a partir del mazo armado por Game.buildDeck.
+// Usa un DocumentFragment para insertar todas las cartas en un solo golpe
+// al DOM en vez de una por una.
 UI.renderBoard = function (deck, columns) {
   var fragment, index;
   UI.setBoardColumnsClass(columns);
@@ -93,10 +110,13 @@ UI.renderBoard = function (deck, columns) {
   UI.elements.board.appendChild(fragment);
 };
 
+// Busca en el tablero el elemento HTML de una carta por su id.
 UI.getCardElement = function (cardId) {
   return UI.elements.board.querySelector('[data-card-id="' + cardId + '"]');
 };
 
+// Marca visualmente una carta como revelada u oculta, y actualiza el
+// aria-label para que un lector de pantalla anuncie el pais al revelarla.
 UI.setCardRevealed = function (cardId, isRevealed, cardName) {
   var cardElement = UI.getCardElement(cardId);
   if (!cardElement) {
@@ -111,6 +131,7 @@ UI.setCardRevealed = function (cardId, isRevealed, cardName) {
   }
 };
 
+// Deja una carta marcada permanentemente como emparejada (borde verde).
 UI.setCardMatched = function (cardId) {
   var cardElement = UI.getCardElement(cardId);
   if (!cardElement) {
@@ -119,6 +140,7 @@ UI.setCardMatched = function (cardId) {
   cardElement.classList.add('card--matched');
 };
 
+// Activa o desactiva el estado visual de error (borde rojo) de una carta.
 UI.setCardIncorrect = function (cardId, isIncorrect) {
   var cardElement = UI.getCardElement(cardId);
   if (!cardElement) {
@@ -131,6 +153,7 @@ UI.setCardIncorrect = function (cardId, isIncorrect) {
   }
 };
 
+// Convierte una cantidad de segundos al formato mm:ss para el temporizador.
 UI.formatTime = function (totalSeconds) {
   var minutes, seconds, pad;
   pad = function (value) {
@@ -141,6 +164,8 @@ UI.formatTime = function (totalSeconds) {
   return pad(minutes) + ':' + pad(seconds);
 };
 
+// Actualiza todos los contadores visibles durante la partida (jugador,
+// nivel, intentos, errores, pares, puntaje y tiempo).
 UI.updateStats = function (state) {
   UI.elements.statPlayerName.textContent = state.playerName;
   UI.elements.statLevel.textContent = state.level.label;
@@ -151,6 +176,7 @@ UI.updateStats = function (state) {
   UI.elements.statTime.textContent = UI.formatTime(state.elapsedSeconds);
 };
 
+// Crea un renglon de texto para el resumen del modal de victoria.
 UI.buildSummaryItem = function (label, value) {
   var listItem = document.createElement('li');
   listItem.className = 'modal__summary-item';
@@ -158,6 +184,8 @@ UI.buildSummaryItem = function (label, value) {
   return listItem;
 };
 
+// Arma y muestra el modal final con los datos pedidos por la consigna:
+// jugador, nivel, intentos, errores, tiempo total y puntaje final.
 UI.showWinModal = function (state) {
   UI.elements.winSummaryList.textContent = '';
   UI.elements.winSummaryList.appendChild(UI.buildSummaryItem('Jugador', state.playerName));
@@ -173,6 +201,7 @@ UI.hideWinModal = function () {
   UI.hideElement(UI.elements.winModal);
 };
 
+// Crea una fila de la tabla del ranking con los datos de una partida guardada.
 UI.buildRankingRow = function (entry) {
   var row = document.createElement('tr');
   row.appendChild(UI.buildTableCell(entry.playerName));
@@ -191,6 +220,7 @@ UI.buildTableCell = function (textContent) {
   return cell;
 };
 
+// Dibuja la tabla del ranking, o el mensaje de "no hay partidas" si esta vacio.
 UI.renderRanking = function (rankingEntries) {
   var fragment, index;
   UI.elements.rankingTableBody.textContent = '';
@@ -216,6 +246,8 @@ UI.hideRankingModal = function () {
   UI.hideElement(UI.elements.rankingModal);
 };
 
+// Modal de confirmacion generico (reemplaza a window.confirm), usado por
+// ejemplo para confirmar el borrado del ranking.
 UI.showConfirmModal = function (message) {
   UI.elements.confirmModalMessage.textContent = message;
   UI.showElement(UI.elements.confirmModal);
@@ -225,6 +257,9 @@ UI.hideConfirmModal = function () {
   UI.hideElement(UI.elements.confirmModal);
 };
 
+// Aplica el tema claro u oscuro agregando/quitando una clase en el body
+// (los colores estan definidos como variables CSS en styles.css) y cambia
+// el icono del boton de tema.
 UI.applyTheme = function (themeName) {
   if (themeName === 'dark') {
     document.body.classList.add('theme-dark');
@@ -235,6 +270,7 @@ UI.applyTheme = function (themeName) {
   }
 };
 
+// Cambia el icono del boton de sonido segun si esta activado o no.
 UI.applySoundIcon = function (isEnabled) {
   UI.elements.soundToggleButton.textContent = isEnabled ? '🔊' : '🔇';
 };
