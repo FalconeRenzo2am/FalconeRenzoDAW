@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memotest Banderas del Mundo</title>
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1 class="site-header__title">Memotest Banderas del Mundo</h1>
+    <nav class="site-nav">
+      <ul class="site-nav__list">
+        <li class="site-nav__item">
+          <a class="site-nav__link site-nav__link--active" href="index.html">Jugar</a>
+        </li>
+        <li class="site-nav__item">
+          <a class="site-nav__link" href="pages/contact.html">Contacto</a>
+        </li>
+        <li class="site-nav__item">
+          <a class="site-nav__link" href="https://github.com/falconerenzo2am/falconerenzodaw" target="_blank" rel="noopener noreferrer">Repositorio</a>
+        </li>
+      </ul>
+      <div class="site-nav__toggles">
+        <button class="icon-button" type="button" id="themeToggleButton" aria-label="Cambiar entre modo claro y oscuro">🌙</button>
+        <button class="icon-button" type="button" id="soundToggleButton" aria-label="Activar o desactivar sonido">🔊</button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="main-content">
+    <section class="setup-screen" id="setupScreen">
+      <h2 class="setup-screen__title">Encontrá todos los pares de banderas</h2>
+      <p class="setup-screen__description">Ingresá tu nombre, elegí un nivel de dificultad y poné a prueba tu memoria.</p>
+      <form class="setup-form" id="setupForm" novalidate>
+        <div class="setup-form__group">
+          <label class="setup-form__label" for="playerNameInput">Nombre del jugador</label>
+          <input class="setup-form__input" type="text" id="playerNameInput" name="playerName" autocomplete="off" placeholder="Ingresá tu nombre">
+          <p class="setup-form__error" id="playerNameError" role="alert"></p>
+        </div>
+        <fieldset class="setup-form__group setup-form__fieldset">
+          <legend class="setup-form__label">Nivel de dificultad</legend>
+          <div class="level-options" id="levelOptions">
+            <label class="level-options__item">
+              <input type="radio" name="level" value="facil" checked>
+              <span>Fácil <small>(4x4 - 8 pares)</small></span>
+            </label>
+            <label class="level-options__item">
+              <input type="radio" name="level" value="medio">
+              <span>Medio <small>(5x4 - 10 pares)</small></span>
+            </label>
+            <label class="level-options__item">
+              <input type="radio" name="level" value="dificil">
+              <span>Difícil <small>(6x6 - 18 pares)</small></span>
+            </label>
+          </div>
+        </fieldset>
+        <button class="primary-button" type="submit" id="startGameButton">Comenzar partida</button>
+      </form>
+      <button class="secondary-button" id="openRankingButton" type="button">Ver ranking de partidas</button>
+    </section>
+
+    <section class="game-screen hidden" id="gameScreen">
+      <div class="game-stats" id="gameStats">
+        <p class="game-stats__item">Jugador<span class="game-stats__value" id="statPlayerName"></span></p>
+        <p class="game-stats__item">Nivel<span class="game-stats__value" id="statLevel"></span></p>
+        <p class="game-stats__item">Intentos<span class="game-stats__value" id="statAttempts">0</span></p>
+        <p class="game-stats__item">Errores<span class="game-stats__value" id="statErrors">0</span></p>
+        <p class="game-stats__item">Pares<span class="game-stats__value" id="statPairs">0 / 0</span></p>
+        <p class="game-stats__item">Puntaje<span class="game-stats__value" id="statScore">0</span></p>
+        <p class="game-stats__item">Tiempo<span class="game-stats__value" id="statTime">00:00</span></p>
+      </div>
+      <div class="board" id="board"></div>
+      <div class="game-actions">
+        <button class="secondary-button" id="restartButton" type="button">Reiniciar partida</button>
+        <button class="secondary-button" id="changeLevelButton" type="button">Cambiar jugador o nivel</button>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal-overlay hidden" id="winModal" role="dialog" aria-modal="true" aria-labelledby="winModalTitle">
+    <div class="modal">
+      <h2 class="modal__title" id="winModalTitle">¡Felicitaciones!</h2>
+      <ul class="modal__summary" id="winSummaryList"></ul>
+      <div class="modal__actions">
+        <button class="primary-button" id="winPlayAgainButton" type="button">Jugar de nuevo</button>
+        <button class="secondary-button" id="winCloseButton" type="button">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay hidden" id="rankingModal" role="dialog" aria-modal="true" aria-labelledby="rankingModalTitle">
+    <div class="modal modal--wide">
+      <h2 class="modal__title" id="rankingModalTitle">Ranking de partidas</h2>
+      <div class="ranking-controls">
+        <label class="ranking-controls__label" for="rankingSortSelect">Ordenar por</label>
+        <select class="ranking-controls__select" id="rankingSortSelect">
+          <option value="score">Puntaje</option>
+          <option value="date">Fecha</option>
+          <option value="duration">Duración</option>
+          <option value="level">Nivel</option>
+        </select>
+      </div>
+      <div class="ranking-table-wrapper">
+        <table class="ranking-table" id="rankingTable">
+          <thead>
+            <tr>
+              <th>Jugador</th>
+              <th>Puntaje</th>
+              <th>Nivel</th>
+              <th>Intentos</th>
+              <th>Errores</th>
+              <th>Duración</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody id="rankingTableBody"></tbody>
+        </table>
+        <p class="ranking-empty hidden" id="rankingEmptyMessage">Todavía no hay partidas registradas.</p>
+      </div>
+      <div class="modal__actions">
+        <button class="danger-button" id="clearRankingButton" type="button">Borrar historial</button>
+        <button class="secondary-button" id="closeRankingButton" type="button">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay hidden" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+    <div class="modal">
+      <h2 class="modal__title" id="confirmModalTitle">Confirmar acción</h2>
+      <p class="modal__message" id="confirmModalMessage"></p>
+      <div class="modal__actions">
+        <button class="danger-button" id="confirmAcceptButton" type="button">Confirmar</button>
+        <button class="secondary-button" id="confirmCancelButton" type="button">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <p class="site-footer__text">Proyecto Final - Desarrollo y Arquitecturas Web - Ingeniería en Sistemas Informáticos 2026</p>
+    <p class="site-footer__text">
+      <a class="site-footer__link" href="https://github.com/falconerenzo2am/falconerenzodaw" target="_blank" rel="noopener noreferrer">Código en GitHub</a>
+      -
+      <a class="site-footer__link" href="https://falconerenzo2am.github.io/falconerenzodaw/" target="_blank" rel="noopener noreferrer">Ver publicado en GitHub Pages</a>
+    </p>
+  </footer>
+
+  <script src="js/validations.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/sounds.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
