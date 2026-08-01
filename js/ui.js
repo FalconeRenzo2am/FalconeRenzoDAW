@@ -75,7 +75,7 @@ UI.buildCardElement = function (card) {
   cardFront.textContent = '?';
   cardBack = document.createElement('span');
   cardBack.className = 'card__face card__face--back';
-  cardBack.textContent = card.emoji;
+  cardBack.innerHTML = card.svg;
   cardInner.appendChild(cardFront);
   cardInner.appendChild(cardBack);
   cardButton.appendChild(cardInner);

@@ -15,7 +15,7 @@ El jugador debe encontrar todos los pares de cartas iguales en un tablero de car
 
 ## Temática elegida
 
-Banderas del mundo. Cada carta oculta una bandera representada como emoji junto con el nombre del país (accesible mediante `aria-label`), manteniendo una estética, paleta de colores y textos coherentes en toda la aplicación.
+Banderas del mundo. Cada carta oculta una bandera dibujada en SVG propio (sin depender de fuentes del sistema ni de imágenes externas) junto con el nombre del país (accesible mediante `aria-label`), manteniendo una estética, paleta de colores y textos coherentes en toda la aplicación.
 
 ## Reglas del juego
 

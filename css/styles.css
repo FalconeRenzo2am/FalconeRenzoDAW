@@ -335,6 +335,7 @@ a:focus-visible {
   justify-content: center;
   width: 100%;
   height: 100%;
+  overflow: hidden;
   backface-visibility: hidden;
   border-radius: var(--radius-small);
   font-size: 1.8rem;
@@ -350,6 +351,12 @@ a:focus-visible {
   background-color: var(--color-surface);
   border: 0.0625rem solid var(--color-border);
   transform: rotateY(180deg);
+}
+
+.card__face--back svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .card--matched .card__face--back {
