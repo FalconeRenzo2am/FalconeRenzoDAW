@@ -6,8 +6,8 @@ Juego de memoria (memotest) desarrollado en HTML5, CSS3 y JavaScript ES5 puro, s
 
 ## Demo
 
-- Repositorio: https://github.com/falconerenzo2am/falconerenzodaw
-- Publicado en GitHub Pages: https://falconerenzo2am.github.io/falconerenzodaw/
+- Repositorio: https://github.com/FalconeRenzo2am/FalconeRenzoDAW
+- Publicado en GitHub Pages: https://falconerenzo2am.github.io/FalconeRenzoDAW/
 
 ## Descripción del juego
 
