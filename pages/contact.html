@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contacto - Memotest Banderas del Mundo</title>
+  <link rel="stylesheet" href="../css/reset.css">
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1 class="site-header__title">Memotest Banderas del Mundo</h1>
+    <nav class="site-nav">
+      <ul class="site-nav__list">
+        <li class="site-nav__item">
+          <a class="site-nav__link" href="../index.html">Jugar</a>
+        </li>
+        <li class="site-nav__item">
+          <a class="site-nav__link site-nav__link--active" href="contact.html">Contacto</a>
+        </li>
+        <li class="site-nav__item">
+          <a class="site-nav__link" href="https://github.com/falconerenzo2am/falconerenzodaw" target="_blank" rel="noopener noreferrer">Repositorio</a>
+        </li>
+      </ul>
+      <div class="site-nav__toggles">
+        <button class="icon-button" type="button" id="themeToggleButton" aria-label="Cambiar entre modo claro y oscuro">🌙</button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="main-content">
+    <section class="contact-screen">
+      <h2 class="contact-screen__title">Contacto</h2>
+      <p class="contact-screen__description">¿Encontraste un error o querés dejarnos un comentario sobre el juego? Escribinos.</p>
+      <form class="contact-form" id="contactForm" novalidate>
+        <div class="contact-form__group">
+          <label class="contact-form__label" for="contactNameInput">Nombre</label>
+          <input class="contact-form__input" type="text" id="contactNameInput" name="contactName" autocomplete="off" placeholder="Tu nombre">
+          <p class="contact-form__error" id="contactNameError" role="alert"></p>
+        </div>
+        <div class="contact-form__group">
+          <label class="contact-form__label" for="contactEmailInput">Mail</label>
+          <input class="contact-form__input" type="text" id="contactEmailInput" name="contactEmail" autocomplete="off" placeholder="tu@mail.com">
+          <p class="contact-form__error" id="contactEmailError" role="alert"></p>
+        </div>
+        <div class="contact-form__group">
+          <label class="contact-form__label" for="contactMessageInput">Mensaje</label>
+          <textarea class="contact-form__textarea" id="contactMessageInput" name="contactMessage" rows="5" placeholder="Contanos qué te pareció el juego"></textarea>
+          <p class="contact-form__error" id="contactMessageError" role="alert"></p>
+        </div>
+        <button class="primary-button" type="submit" id="sendContactButton">Enviar mensaje</button>
+        <p class="contact-form__feedback" id="contactFeedbackMessage" role="status"></p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p class="site-footer__text">Proyecto Final - Desarrollo y Arquitecturas Web - Ingeniería en Sistemas Informáticos 2026</p>
+    <p class="site-footer__text">
+      <a class="site-footer__link" href="https://github.com/falconerenzo2am/falconerenzodaw" target="_blank" rel="noopener noreferrer">Código en GitHub</a>
+      -
+      <a class="site-footer__link" href="https://falconerenzo2am.github.io/falconerenzodaw/" target="_blank" rel="noopener noreferrer">Ver publicado en GitHub Pages</a>
+    </p>
+  </footer>
+
+  <script src="../js/validations.js"></script>
+  <script src="../js/storage.js"></script>
+  <script src="../js/contact.js"></script>
+</body>
+</html>
